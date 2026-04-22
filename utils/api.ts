@@ -15,6 +15,11 @@ api.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Let browser set multipart boundary automatically.
+    if (config.data instanceof FormData && config.headers) {
+        delete config.headers['Content-Type'];
+    }
+
     return config;
 });
 
