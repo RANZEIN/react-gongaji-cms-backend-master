@@ -8,14 +8,14 @@ import type { Article } from '@/types/article';
 
 export default function CreateArticlePage() {
   const [form, setForm] = useState<Partial<Article>>({
-    article_status: 'draft'
+    article_status: 'DRAFT'
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const toast = useRef<Toast>(null);
 
-  const onChange = (key: keyof Article, value: string | File) => {
+  const onChange = (key: keyof Article, value: string | string[] | File) => {
     if (value instanceof File) setImageFile(value);
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -45,7 +45,11 @@ export default function CreateArticlePage() {
         return;
       }
 
-      await createArticle({ ...form, article_image: imageFile as any });
+      const payload: Partial<Article> = { ...form };
+      if (imageFile) {
+        payload.article_image = imageFile;
+      }
+      await createArticle(payload);
       toast.current?.show({ severity: 'success', summary: 'Berhasil', detail: 'Artikel berhasil dibuat' });
       router.push('/articles');
     } catch (e: any) {
