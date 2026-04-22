@@ -16,6 +16,21 @@ const AppMenu = () => {
             items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
         },
         {
+            label: 'Article CMS',
+            items: [
+                { label: 'Articles', icon: 'pi pi-fw pi-list', to: '/articles' },
+                { label: 'Create Article', icon: 'pi pi-fw pi-plus-circle', to: '/articles/create' }
+            ]
+        },
+        {
+            label: 'Authentication',
+            items: [
+                { label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/auth/login' },
+                { label: 'Signup', icon: 'pi pi-fw pi-user-plus', to: '/auth/signup' },
+                { label: 'Signout', icon: 'pi pi-fw pi-sign-out', to: '/auth/signout' }
+            ]
+        },
+        {
             label: 'UI Components',
             items: [
                 { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
