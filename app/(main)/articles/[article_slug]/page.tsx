@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { Tag } from 'primereact/tag';
 import { getArticleBySlug } from '@/services/articleService';
 import type { Article } from '@/types/article';
 
@@ -43,18 +44,47 @@ export default function ArticleDetailPage() {
         return <div className="card">Article not found.</div>;
     }
 
+    const cleanText = (article.article_content || '').replace(/<[^>]+>/g, '').trim();
+    const status = (article.article_status || '').toUpperCase();
+    const severity = status === 'PUBLISHED' ? 'success' : status === 'REVIEW' ? 'warning' : 'info';
+
     return (
         <div className="card">
-            <div className="flex justify-content-between align-items-center mb-4">
-                <h4 className="m-0">{article.article_title}</h4>
+            <div className="flex justify-content-between align-items-start mb-4">
+                <div className="flex align-items-center gap-3">
+                    {article.article_image ? (
+                        <img
+                            src={article.article_image as string}
+                            alt={article.article_title}
+                            className="border-round"
+                            style={{ width: 64, height: 64, objectFit: 'cover' }}
+                        />
+                    ) : null}
+                    <h4 className="m-0">{article.article_title || '-'}</h4>
+                </div>
                 <Button label="Back" icon="pi pi-arrow-left" text onClick={() => router.push('/articles')} />
             </div>
 
-            <div className="text-600 mb-3">
-                {article.article_category} - {article.article_status}
+            <div className="flex flex-wrap gap-2 align-items-center mb-3">
+                <Tag value={status || 'DRAFT'} severity={severity} />
+                <span className="text-600">{article.article_category || '-'}</span>
+                <span className="text-600">Penulis: {article.article_author || '-'}</span>
             </div>
 
-            {article.article_image && <img src={article.article_image} alt={article.article_title} className="w-full border-round mb-4" />}
+            {article.article_image && (
+                <img
+                    src={article.article_image as string}
+                    alt={article.article_title}
+                    className="w-full border-round mb-4"
+                    style={{ maxHeight: 360, objectFit: 'cover' }}
+                />
+            )}
+
+            {cleanText && (
+                <div className="surface-100 p-3 border-round mb-4">
+                    <div className="text-700 line-height-3">{cleanText}</div>
+                </div>
+            )}
 
             <div dangerouslySetInnerHTML={{ __html: article.article_description ?? '' }} />
         </div>
