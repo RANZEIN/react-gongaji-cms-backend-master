@@ -39,18 +39,19 @@ export default function EditArticlePage() {
     if (slug) loadArticle();
   }, [slug]);
 
-  const onChange = (key: keyof Article, value: string | File) => {
+  const onChange = (key: keyof Article, value: string | string[] | File) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const onSubmit = async () => {
     try {
       setLoading(true);
-      if (!slug) {
-        toast.current?.show({ severity: 'error', summary: 'Gagal', detail: 'Slug artikel tidak ditemukan' });
+      const articleUuid = form.article_uuid as string | undefined;
+      if (!articleUuid) {
+        toast.current?.show({ severity: 'error', summary: 'Gagal', detail: 'UUID artikel tidak ditemukan' });
         return;
       }
-      await updateArticle(slug, form);
+      await updateArticle(articleUuid, form);
       toast.current?.show({ severity: 'success', summary: 'Berhasil', detail: 'Artikel berhasil diupdate' });
       router.push('/articles');
     } catch (e: any) {
