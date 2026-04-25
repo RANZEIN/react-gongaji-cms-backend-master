@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -10,7 +10,8 @@ import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { useRef } from 'react';
+import { Image } from 'primereact/image';
+
 import { deleteArticle, getArticleCategories, getArticles } from '@/services/articleService';
 import type { Article, ArticleCategory } from '@/types/article';
 
@@ -21,6 +22,7 @@ export default function ArticlesPage() {
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
+
     const router = useRouter();
     const toast = useRef<Toast>(null);
 
@@ -28,9 +30,11 @@ export default function ArticlesPage() {
         try {
             setLoading(true);
             const params: Record<string, string> = { overview: 'TRUE' };
+
             if (keyword.trim()) params.keyword = keyword.trim();
             if (statusFilter) params.article_status = statusFilter;
             if (categoryFilter) params.category_uuid = categoryFilter;
+
             const data = await getArticles(params);
             setArticles(data);
         } finally {
@@ -43,6 +47,7 @@ export default function ArticlesPage() {
             const data = await getArticleCategories({ limit: 100, pagination: 1 });
             setCategories(data);
         };
+
         loadCategories();
         loadArticles();
     }, [loadArticles]);
@@ -54,7 +59,11 @@ export default function ArticlesPage() {
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
                 await deleteArticle(articleUuid, articleSlug);
-                toast.current?.show({ severity: 'success', summary: 'Berhasil', detail: 'Artikel dihapus' });
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Berhasil',
+                    detail: 'Artikel dihapus'
+                });
                 loadArticles();
             }
         });
@@ -62,19 +71,47 @@ export default function ArticlesPage() {
 
     const statusBody = (row: Article) => {
         const value = (row.article_status || '').toUpperCase();
-        const severity = value === 'PUBLISHED' ? 'success' : value === 'REVIEW' ? 'warning' : 'info';
+        const severity =
+            value === 'PUBLISHED'
+                ? 'success'
+                : value === 'REVIEW'
+                ? 'warning'
+                : 'info';
+
         return <Tag value={value || 'DRAFT'} severity={severity} />;
     };
 
-    const titleBody = (row: Article) => (
-        <div>
-            <div className="font-semibold">{row.article_title || '-'}</div>
-            <small className="text-500">/{row.article_slug || '-'}</small>
-        </div>
+    const titleBody = (row: Article) => {
+        const imageSrc =
+            typeof row.article_image === 'string'
+                ? row.article_image
+                : '/no-image.png';
+
+        return (
+            <div className="flex align-items-center gap-3">
+                <Image
+                    src={imageSrc}
+                    alt={row.article_title}
+                    width="50"
+                    height="50"
+                    className="border-round"
+                />
+
+                <div>
+                    <div className="font-semibold">{row.article_title || '-'}</div>
+                    <small className="text-500">/{row.article_slug || '-'}</small>
+                </div>
+            </div>
+        );
+    };
+
+    const viewsBody = (row: Article) => (
+        <span>{Number(row.article_total_view || 0).toLocaleString('id-ID')}</span>
     );
 
-    const viewsBody = (row: Article) => <span>{Number(row.article_total_view || 0).toLocaleString('id-ID')}</span>;
-    const likesBody = (row: Article) => <span>{Number(row.article_total_like || 0).toLocaleString('id-ID')}</span>;
+    const likesBody = (row: Article) => (
+        <span>{Number(row.article_total_like || 0).toLocaleString('id-ID')}</span>
+    );
 
     return (
         <div className="card">
@@ -83,7 +120,11 @@ export default function ArticlesPage() {
 
             <div className="flex justify-content-between align-items-center mb-4">
                 <h5 className="m-0">Articles</h5>
-                <Button label="Create Article" icon="pi pi-plus" onClick={() => router.push('/articles/create')} />
+                <Button
+                    label="Create Article"
+                    icon="pi pi-plus"
+                    onClick={() => router.push('/articles/create')}
+                />
             </div>
 
             <div className="grid mb-3">
@@ -95,6 +136,7 @@ export default function ArticlesPage() {
                         className="w-full"
                     />
                 </div>
+
                 <div className="col-12 md:col-3">
                     <Dropdown
                         value={statusFilter}
@@ -111,6 +153,7 @@ export default function ArticlesPage() {
                         className="w-full"
                     />
                 </div>
+
                 <div className="col-12 md:col-3">
                     <Dropdown
                         value={categoryFilter}
@@ -122,8 +165,10 @@ export default function ArticlesPage() {
                         className="w-full"
                     />
                 </div>
+
                 <div className="col-12 md:col-2 flex gap-2">
                     <Button label="Apply" onClick={loadArticles} className="w-full" />
+
                     <Button
                         icon="pi pi-refresh"
                         outlined
@@ -133,6 +178,7 @@ export default function ArticlesPage() {
                             setStatusFilter('');
                             setCategoryFilter('');
                             setLoading(true);
+
                             try {
                                 const data = await getArticles({ overview: 'TRUE' });
                                 setArticles(data);
@@ -144,24 +190,44 @@ export default function ArticlesPage() {
                 </div>
             </div>
 
-            <DataTable value={articles} loading={loading} paginator rows={10} responsiveLayout="scroll" emptyMessage="Belum ada artikel.">
+            <DataTable
+                value={articles}
+                loading={loading}
+                paginator
+                rows={10}
+                responsiveLayout="scroll"
+                emptyMessage="Belum ada artikel."
+            >
+                {/* ❌ Column image dihapus */}
+
                 <Column header="Title" body={titleBody} />
                 <Column field="article_author" header="Author" />
                 <Column field="article_category" header="Category" />
                 <Column header="Status" body={statusBody} />
                 <Column header="Views" body={viewsBody} />
                 <Column header="Likes" body={likesBody} />
+
                 <Column
                     header="Actions"
                     body={(row: Article) => (
                         <div className="flex gap-2">
-                            <Button icon="pi pi-eye" text onClick={() => router.push(`/articles/${row.article_slug}`)} />
-                            <Button icon="pi pi-pencil" text onClick={() => router.push(`/articles/edit/${row.article_slug}`)} />
+                            <Button
+                                icon="pi pi-eye"
+                                text
+                                onClick={() => router.push(`/articles/${row.article_slug}`)}
+                            />
+                            <Button
+                                icon="pi pi-pencil"
+                                text
+                                onClick={() => router.push(`/articles/edit/${row.article_slug}`)}
+                            />
                             <Button
                                 icon="pi pi-trash"
                                 text
                                 severity="danger"
-                                onClick={() => onDelete(row.article_uuid || '', row.article_slug || '')}
+                                onClick={() =>
+                                    onDelete(row.article_uuid || '', row.article_slug || '')
+                                }
                                 disabled={!row.article_uuid && !row.article_slug}
                             />
                         </div>
