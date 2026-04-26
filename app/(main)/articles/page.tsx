@@ -214,7 +214,7 @@ export default function ArticlesPage() {
                             <Button
                                 icon="pi pi-eye"
                                 text
-                                onClick={() => router.push(`/articles/${row.article_slug}`)}
+                                onClick={() => router.push(`/articles/article_view/${row.article_slug}`)}
                             />
                             <Button
                                 icon="pi pi-pencil"
