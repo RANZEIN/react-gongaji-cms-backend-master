@@ -317,6 +317,19 @@ export const getArticleBySlug = async (slug) => {
   return fallback;
 };
 
+// Load article for "view" page (detail) and increment view counter.
+export const getArticleForView = async (slug) => {
+  const article = await getArticleBySlug(slug);
+  if (article?.article_uuid) {
+    try {
+      await setArticleView(article.article_uuid);
+    } catch {
+      // View increment should not block rendering.
+    }
+  }
+  return article;
+};
+
 export const createArticle = async (payload) => {
   try {
     const formData = buildArticleFormData(payload, { includeDraft: true });
