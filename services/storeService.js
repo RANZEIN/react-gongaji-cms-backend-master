@@ -55,7 +55,7 @@ const buildAddressFormData = (payload = {}) => {
 export const getAddresses = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/address/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -183,7 +183,7 @@ export const deleteWishlistByProduct = async (productUuid) => {
 export const getAttributes = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/attribute/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -195,7 +195,7 @@ export const getAttributes = async (params = {}) => {
 export const getBanners = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/banner/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -207,7 +207,7 @@ export const getBanners = async (params = {}) => {
 export const getBrands = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/brand/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -219,7 +219,7 @@ export const getBrands = async (params = {}) => {
 export const getMerchants = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/merchant/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -231,7 +231,7 @@ export const getMerchants = async (params = {}) => {
 export const getMerchantBanners = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/merchant-banner/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
@@ -243,7 +243,7 @@ export const getMerchantBanners = async (params = {}) => {
 export const getMerchantCategories = async (params = {}) => {
     try {
         const response = await api.get(`${BASE_URL_STORE}/v1/merchant-category/get`, {
-            ...withStoreVersion('3'),
+            ...withStoreVersion('V3'),
             params
         });
         return asArray(response.data?.data);
