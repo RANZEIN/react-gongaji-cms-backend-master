@@ -25,6 +25,17 @@ const AppMenu = () => {
             ]
         },
         {
+            label: 'Store',
+            items: [
+                { label: 'Store Addresses', icon: 'pi pi-fw pi-list', to: '/store/addresses' },
+                { label: 'Create Address', icon: 'pi pi-fw pi-plus-circle', to: '/store/addresses/create' },
+                { label: 'Store Brands', icon: 'pi pi-fw pi-globe', to: '/store/brands' },
+                { label: 'Store Merchants', icon: 'pi pi-fw pi-shopping-cart', to: '/store/merchants' },
+                { label: 'Merchant Banners', icon: 'pi pi-fw pi-images', to: '/store/merchant-banners' },
+                { label: 'Merchant Categories', icon: 'pi pi-fw pi-tags', to: '/store/merchant-categories' }
+            ]
+        },
+        {
             label: 'UI Components',
             items: [
                 { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
