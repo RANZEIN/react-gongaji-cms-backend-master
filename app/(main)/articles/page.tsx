@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primereact/autocomplete';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -20,6 +20,7 @@ export default function ArticlesPage() {
     const [categories, setCategories] = useState<ArticleCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [keyword, setKeyword] = useState('');
+    const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([]);
     const [statusFilter, setStatusFilter] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
 
@@ -113,6 +114,32 @@ export default function ArticlesPage() {
         <span>{Number(row.article_total_like || 0).toLocaleString('id-ID')}</span>
     );
 
+    const searchKeyword = async (event: AutoCompleteCompleteEvent) => {
+        const query = `${event.query || ''}`.trim();
+        if (!query || query.length < 2) {
+            setKeywordSuggestions([]);
+            return;
+        }
+
+        try {
+            const data = await getArticles({
+                overview: 'FALSE',
+                keyword: query,
+                type_search: 'FIND',
+                limit: 10,
+                preload_status: 'TRUE'
+            });
+            setKeywordSuggestions(
+                data
+                    .map((entry) => entry.article_title)
+                    .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+                    .slice(0, 10)
+            );
+        } catch {
+            setKeywordSuggestions([]);
+        }
+    };
+
     return (
         <div className="card">
             <Toast ref={toast} />
@@ -129,9 +156,11 @@ export default function ArticlesPage() {
 
             <div className="grid mb-3">
                 <div className="col-12 md:col-4">
-                    <InputText
+                    <AutoComplete
                         value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
+                        suggestions={keywordSuggestions}
+                        completeMethod={searchKeyword}
+                        onChange={(e) => setKeyword(e.value || '')}
                         placeholder="Search title/keyword"
                         className="w-full"
                     />
@@ -175,6 +204,7 @@ export default function ArticlesPage() {
                         className="w-full"
                         onClick={async () => {
                             setKeyword('');
+                            setKeywordSuggestions([]);
                             setStatusFilter('');
                             setCategoryFilter('');
                             setLoading(true);
