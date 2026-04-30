@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primereact/autocomplete';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -11,8 +12,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 
-import { deleteAddress, getAddresses } from '@/services/storeService';
-import type { StoreAddress } from '@/types/store';
+import { deleteAddress, getAddresses } from '@/features/store/services/storeService';
+import type { StoreAddress } from '@/features/store/types';
 
 export default function StoreAddressesPage() {
     const router = useRouter();
@@ -98,10 +99,11 @@ export default function StoreAddressesPage() {
             <Toast ref={toast} />
             <ConfirmDialog />
 
-            <div className="flex justify-content-between align-items-center mb-4">
-                <h5 className="m-0">Store Addresses</h5>
-                <Button label="Create Address" icon="pi pi-plus" onClick={() => router.push('/store/addresses/create')} />
-            </div>
+            <Toolbar
+                start={<h5 className="m-0">Store Addresses</h5>}
+                end={<Button label="Create Address" icon="pi pi-plus" onClick={() => router.push('/store/addresses/create')} />}
+                className="mb-4"
+            />
 
             <div className="grid mb-3">
                 <div className="col-12 md:col-4">
@@ -138,8 +140,8 @@ export default function StoreAddressesPage() {
                     body={(row: StoreAddress) => {
                         const v = row.address_main;
                         const isMain =
-                            v === true || v === 'true' || v === 'TRUE' || v === '1' || v === 1;
-                        return <Tag value={isMain ? 'Yes' : 'No'} severity={isMain ? 'success' : 'secondary'} />;
+                            v === true || v === 'true' || v === 'TRUE' || v === '1';
+                        return <Tag value={isMain ? 'Yes' : 'No'} severity={isMain ? 'success' : 'info'} />;
                     }}
                 />
                 <Column
