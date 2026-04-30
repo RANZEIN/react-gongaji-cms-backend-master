@@ -7,9 +7,9 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import { getMerchantBanners } from '@/services/storeService';
-import StoreMerchantBannerDetails from '@/components/store/StoreMerchantBannerDetails';
-import type { StoreMerchantBanner } from '@/types/store';
+import { getMerchantBanners } from '@/features/store/services/storeService';
+import StoreMerchantBannerDetails from '@/features/store/components/StoreMerchantBannerDetails';
+import type { StoreMerchantBanner } from '@/features/store/types';
 
 export default function StoreMerchantBannerViewPage() {
     const params = useParams();
