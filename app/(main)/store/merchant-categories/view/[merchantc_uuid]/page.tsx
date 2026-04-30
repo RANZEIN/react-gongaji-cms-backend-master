@@ -7,9 +7,9 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import { getMerchantCategories } from '@/services/storeService';
-import StoreMerchantCategoryDetails from '@/components/store/StoreMerchantCategoryDetails';
-import type { StoreMerchantCategory } from '@/types/store';
+import { getMerchantCategories } from '@/features/store/services/storeService';
+import StoreMerchantCategoryDetails from '@/features/store/components/StoreMerchantCategoryDetails';
+import type { StoreMerchantCategory } from '@/features/store/types';
 
 export default function StoreMerchantCategoryViewPage() {
     const params = useParams();
