@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from 'primereact/toast';
 
-import AddressForm from '@/components/store/AddressForm';
-import { createAddress } from '@/services/storeService';
-import type { StoreAddress, StoreAddressCreatePayload } from '@/types/store';
+import AddressForm from '@/features/store/components/AddressForm';
+import { createAddress } from '@/features/store/services/storeService';
+import type { StoreAddress, StoreAddressCreatePayload } from '@/features/store/types';
 
 export default function CreateStoreAddressPage() {
     const router = useRouter();
