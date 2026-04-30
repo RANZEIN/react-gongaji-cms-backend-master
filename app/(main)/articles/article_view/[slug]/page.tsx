@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { Skeleton } from 'primereact/skeleton';
 import { Divider } from 'primereact/divider';
 
-import { getArticleForView } from '@/services/articleService';
-import type { Article } from '@/types/article';
+import { getArticleForView } from '@/features/articles/services/articleService';
+import type { Article } from '@/features/articles/types';
 
 export default function ArticleViewDynamicPage() {
     const params = useParams();
@@ -96,23 +97,25 @@ export default function ArticleViewDynamicPage() {
 
     return (
         <div className="card">
-            <div className="flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-                <Button
-                    label="Kembali"
-                    icon="pi pi-arrow-left"
-                    text
-                    onClick={() => router.back()}
-                />
-
-                <div className="flex gap-2">
+            <Toolbar
+                start={
+                    <Button
+                        label="Kembali"
+                        icon="pi pi-arrow-left"
+                        text
+                        onClick={() => router.back()}
+                    />
+                }
+                end={
                     <Button
                         label="Edit"
                         icon="pi pi-pencil"
                         outlined
                         onClick={() => router.push(`/articles/edit/${article.article_slug}`)}
                     />
-                </div>
-            </div>
+                }
+                className="mb-4"
+            />
 
             <div
                 className="w-full border-round-xl overflow-hidden mb-4"
