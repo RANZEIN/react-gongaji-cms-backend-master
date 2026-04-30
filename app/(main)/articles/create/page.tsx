@@ -2,9 +2,9 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from 'primereact/toast';
-import ArticleForm from '@/components/articles/ArticleForm';
-import { createArticle } from '@/services/articleService';
-import type { Article } from '@/types/article';
+import ArticleForm from '@/features/articles/components/ArticleForm';
+import { createArticle } from '@/features/articles/services/articleService';
+import type { Article } from '@/features/articles/types';
 
 export default function CreateArticlePage() {
   const [form, setForm] = useState<Partial<Article>>({
