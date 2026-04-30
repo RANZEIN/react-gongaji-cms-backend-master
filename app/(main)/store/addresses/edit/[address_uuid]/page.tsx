@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 
-import AddressForm from '@/components/store/AddressForm';
-import { getAddresses, updateAddress } from '@/services/storeService';
-import type { StoreAddress, StoreAddressCreatePayload } from '@/types/store';
+import AddressForm from '@/features/store/components/AddressForm';
+import { getAddresses, updateAddress } from '@/features/store/services/storeService';
+import type { StoreAddress, StoreAddressCreatePayload } from '@/features/store/types';
 
 export default function EditStoreAddressPage() {
     const params = useParams();
