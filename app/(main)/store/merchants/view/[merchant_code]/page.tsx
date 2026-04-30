@@ -7,9 +7,9 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import { getMerchants } from '@/services/storeService';
-import StoreMerchantDetails from '@/components/store/StoreMerchantDetails';
-import type { StoreMerchant } from '@/types/store';
+import { getMerchants } from '@/features/store/services/storeService';
+import StoreMerchantDetails from '@/features/store/components/StoreMerchantDetails';
+import type { StoreMerchant } from '@/features/store/types';
 
 export default function StoreMerchantViewPage() {
     const params = useParams();
