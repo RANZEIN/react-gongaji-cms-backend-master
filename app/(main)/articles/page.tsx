@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -12,8 +13,8 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Image } from 'primereact/image';
 
-import { deleteArticle, getArticleCategories, getArticles } from '@/services/articleService';
-import type { Article, ArticleCategory } from '@/types/article';
+import { deleteArticle, getArticleCategories, getArticles } from '@/features/articles/services/articleService';
+import type { Article, ArticleCategory } from '@/features/articles/types';
 
 export default function ArticlesPage() {
     const [articles, setArticles] = useState<Article[]>([]);
@@ -145,14 +146,17 @@ export default function ArticlesPage() {
             <Toast ref={toast} />
             <ConfirmDialog />
 
-            <div className="flex justify-content-between align-items-center mb-4">
-                <h5 className="m-0">Articles</h5>
-                <Button
-                    label="Create Article"
-                    icon="pi pi-plus"
-                    onClick={() => router.push('/articles/create')}
-                />
-            </div>
+            <Toolbar
+                start={<h5 className="m-0">Articles</h5>}
+                end={
+                    <Button
+                        label="Create Article"
+                        icon="pi pi-plus"
+                        onClick={() => router.push('/articles/create')}
+                    />
+                }
+                className="mb-4"
+            />
 
             <div className="grid mb-3">
                 <div className="col-12 md:col-4">
