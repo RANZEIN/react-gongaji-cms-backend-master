@@ -7,9 +7,9 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import { getBrands } from '@/services/storeService';
-import StoreBrandDetails from '@/components/store/StoreBrandDetails';
-import type { StoreBrand } from '@/types/store';
+import { getBrands } from '@/features/store/services/storeService';
+import StoreBrandDetails from '@/features/store/components/StoreBrandDetails';
+import type { StoreBrand } from '@/features/store/types';
 
 export default function StoreBrandViewPage() {
     const params = useParams();
