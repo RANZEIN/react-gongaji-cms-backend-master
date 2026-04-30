@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Tag } from 'primereact/tag';
 
-import { getAddresses } from '@/services/storeService';
-import type { StoreAddress } from '@/types/store';
+import { getAddresses } from '@/features/store/services/storeService';
+import type { StoreAddress } from '@/features/store/types';
 
 export default function ViewStoreAddressPage() {
     const params = useParams();
@@ -61,29 +62,32 @@ export default function ViewStoreAddressPage() {
         address.address_main === true ||
         address.address_main === 'true' ||
         address.address_main === 'TRUE' ||
-        address.address_main === 1 ||
         address.address_main === '1';
 
     return (
         <div className="card">
-            <div className="flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
-                <Button
-                    label="Kembali"
-                    icon="pi pi-arrow-left"
-                    text
-                    onClick={() => router.push('/store/addresses')}
-                />
-
-                <div className="flex gap-2 align-items-center">
-                    <Tag value={isMain ? 'MAIN' : 'NON-MAIN'} severity={isMain ? 'success' : 'secondary'} />
+            <Toolbar
+                start={
                     <Button
-                        label="Edit"
-                        icon="pi pi-pencil"
-                        outlined
-                        onClick={() => router.push(`/store/addresses/edit/${address.address_uuid}`)}
+                        label="Kembali"
+                        icon="pi pi-arrow-left"
+                        text
+                        onClick={() => router.push('/store/addresses')}
                     />
-                </div>
-            </div>
+                }
+                end={
+                    <div className="flex gap-2 align-items-center">
+                        <Tag value={isMain ? 'MAIN' : 'NON-MAIN'} severity={isMain ? 'success' : 'info'} />
+                        <Button
+                            label="Edit"
+                            icon="pi pi-pencil"
+                            outlined
+                            onClick={() => router.push(`/store/addresses/edit/${address.address_uuid}`)}
+                        />
+                    </div>
+                }
+                className="mb-4"
+            />
 
             <div className="grid">
                 <div className="col-12 md:col-6">
