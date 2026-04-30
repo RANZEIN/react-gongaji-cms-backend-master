@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { Skeleton } from 'primereact/skeleton';
 import { Divider } from 'primereact/divider';
 import { Image } from 'primereact/image';
 
-import { getArticleBySlug } from '@/services/articleService';
-import type { Article } from '@/types/article';
+import { getArticleBySlug } from '@/features/articles/services/articleService';
+import type { Article } from '@/features/articles/types';
 
 export default function ArticleViewPage() {
     const params = useParams();
@@ -97,16 +98,16 @@ export default function ArticleViewPage() {
 
     return (
         <div className="card">
-            {/* ── Top Bar ── */}
-            <div className="flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-                <Button
-                    label="Kembali"
-                    icon="pi pi-arrow-left"
-                    text
-                    onClick={() => router.back()}
-                />
-
-                <div className="flex gap-2">
+            <Toolbar
+                start={
+                    <Button
+                        label="Kembali"
+                        icon="pi pi-arrow-left"
+                        text
+                        onClick={() => router.back()}
+                    />
+                }
+                end={
                     <Button
                         label="Edit"
                         icon="pi pi-pencil"
@@ -115,8 +116,9 @@ export default function ArticleViewPage() {
                             router.push(`/articles/edit/${article.article_slug}`)
                         }
                     />
-                </div>
-            </div>
+                }
+                className="mb-4"
+            />
 
             {/* ── Hero Image ── */}
             <div
