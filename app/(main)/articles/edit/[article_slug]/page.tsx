@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Toast } from 'primereact/toast';
-import ArticleForm from '@/components/articles/ArticleForm';
-import { getArticleBySlug, updateArticle } from '@/services/articleService';
-import type { Article } from '@/types/article';
+import ArticleForm from '@/features/articles/components/ArticleForm';
+import { getArticleBySlug, updateArticle } from '@/features/articles/services/articleService';
+import type { Article } from '@/features/articles/types';
 
 export default function EditArticlePage() {
   const params = useParams();
