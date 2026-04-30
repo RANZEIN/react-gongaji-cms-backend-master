@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -8,8 +9,8 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
-import { createArticleTag, deleteArticleTag, getArticleTags, toggleArticleTagActive, updateArticleTag } from '@/services/articleService';
-import type { ArticleTag } from '@/types/article';
+import { createArticleTag, deleteArticleTag, getArticleTags, toggleArticleTagActive, updateArticleTag } from '@/features/articles/services/articleService';
+import type { ArticleTag } from '@/features/articles/types';
 
 export default function ArticleTagsPage() {
     const toast = useRef<Toast>(null);
@@ -80,10 +81,11 @@ export default function ArticleTagsPage() {
     return (
         <div className="card">
             <Toast ref={toast} />
-            <div className="flex justify-content-between align-items-center mb-4">
-                <h5 className="m-0">Article Tags</h5>
-                <Button label="Create Tag" icon="pi pi-plus" onClick={openCreate} />
-            </div>
+            <Toolbar
+                start={<h5 className="m-0">Article Tags</h5>}
+                end={<Button label="Create Tag" icon="pi pi-plus" onClick={openCreate} />}
+                className="mb-4"
+            />
             <DataTable value={rows} loading={loading} paginator rows={10}>
                 <Column field="tag_name" header="Name" />
                 <Column field="tag_description" header="Description" />
