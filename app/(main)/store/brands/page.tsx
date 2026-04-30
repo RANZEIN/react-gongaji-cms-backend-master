@@ -4,14 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primereact/autocomplete';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
+import { Image } from 'primereact/image';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 
-import { getBrands } from '@/services/storeService';
-import type { StoreBrand } from '@/types/store';
+import { getBrands } from '@/features/store/services/storeService';
+import type { StoreBrand } from '@/features/store/types';
 
 export default function StoreBrandsPage() {
     const router = useRouter();
@@ -78,20 +80,23 @@ export default function StoreBrandsPage() {
     };
 
     const isActive = (v: any) =>
-        v === true || v === 'true' || v === 'TRUE' || v === '1' || v === 1;
+        v === true || v === 'true' || v === 'TRUE' || v === '1';
 
     return (
         <div className="card">
             <Toast ref={toastRef} />
 
-            <div className="flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h5 className="m-0">Store Brands</h5>
-                <Button
-                    icon="pi pi-refresh"
-                    outlined
-                    onClick={() => loadBrands({ type_search: 'first' })}
-                />
-            </div>
+            <Toolbar
+                start={<h5 className="m-0">Store Brands</h5>}
+                end={
+                    <Button
+                        icon="pi pi-refresh"
+                        outlined
+                        onClick={() => loadBrands({ type_search: 'first' })}
+                    />
+                }
+                className="mb-4"
+            />
 
             <div className="grid mb-3">
                 <div className="col-12 md:col-4">
@@ -127,8 +132,13 @@ export default function StoreBrandsPage() {
                     body={(row: StoreBrand) => {
                         const src = row.brand_image as string | undefined;
                         return src ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={src} alt={row.brand_name || 'brand'} style={{ width: 70, height: 40, objectFit: 'cover' }} />
+                            <Image
+                                src={src}
+                                alt={row.brand_name || 'brand'}
+                                width="70"
+                                height="40"
+                                className="border-round"
+                            />
                         ) : (
                             <span>-</span>
                         );
@@ -138,7 +148,7 @@ export default function StoreBrandsPage() {
                     field="brand_active"
                     header="Active"
                     body={(row: StoreBrand) => (
-                        <Tag value={isActive(row.brand_active) ? 'Yes' : 'No'} severity={isActive(row.brand_active) ? 'success' : 'secondary'} />
+                        <Tag value={isActive(row.brand_active) ? 'Yes' : 'No'} severity={isActive(row.brand_active) ? 'success' : 'info'} />
                     )}
                 />
                 <Column
