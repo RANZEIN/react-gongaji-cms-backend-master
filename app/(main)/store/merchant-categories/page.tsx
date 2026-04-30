@@ -4,14 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primereact/autocomplete';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
+import { Image } from 'primereact/image';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 
-import { getMerchantCategories } from '@/services/storeService';
-import type { StoreMerchantCategory } from '@/types/store';
+import { getMerchantCategories } from '@/features/store/services/storeService';
+import type { StoreMerchantCategory } from '@/features/store/types';
 
 export default function StoreMerchantCategoriesPage() {
     const router = useRouter();
@@ -78,16 +80,23 @@ export default function StoreMerchantCategoriesPage() {
     };
 
     const isActive = (v: any) =>
-        v === true || v === 'true' || v === 'TRUE' || v === '1' || v === 1;
+        v === true || v === 'true' || v === 'TRUE' || v === '1';
 
     return (
         <div className="card">
             <Toast ref={toastRef} />
 
-            <div className="flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h5 className="m-0">Store Merchant Categories</h5>
-                <Button icon="pi pi-refresh" outlined onClick={() => loadCategories({ type_search: 'first' })} />
-            </div>
+            <Toolbar
+                start={<h5 className="m-0">Store Merchant Categories</h5>}
+                end={
+                    <Button
+                        icon="pi pi-refresh"
+                        outlined
+                        onClick={() => loadCategories({ type_search: 'first' })}
+                    />
+                }
+                className="mb-4"
+            />
 
             <div className="grid mb-3">
                 <div className="col-12 md:col-4">
@@ -123,8 +132,13 @@ export default function StoreMerchantCategoriesPage() {
                     body={(row: StoreMerchantCategory) => {
                         const src = row.merchantc_icon as string | undefined;
                         return src ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={src} alt={row.merchantc_name || 'category'} style={{ width: 70, height: 40, objectFit: 'cover' }} />
+                            <Image
+                                src={src}
+                                alt={row.merchantc_name || 'category'}
+                                width="70"
+                                height="40"
+                                className="border-round"
+                            />
                         ) : (
                             <span>-</span>
                         );
@@ -137,7 +151,7 @@ export default function StoreMerchantCategoriesPage() {
                     body={(row: StoreMerchantCategory) => (
                         <Tag
                             value={isActive(row.merchantc_active) ? 'Yes' : 'No'}
-                            severity={isActive(row.merchantc_active) ? 'success' : 'secondary'}
+                            severity={isActive(row.merchantc_active) ? 'success' : 'info'}
                         />
                     )}
                 />
