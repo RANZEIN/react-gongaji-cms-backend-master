@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Tag } from 'primereact/tag';
-import { getArticleBySlug } from '@/services/articleService';
-import type { Article } from '@/types/article';
+import { getArticleBySlug } from '@/features/articles/services/articleService';
+import type { Article } from '@/features/articles/types';
 
 export default function ArticleDetailPage() {
     const params = useParams();
@@ -50,20 +51,25 @@ export default function ArticleDetailPage() {
 
     return (
         <div className="card">
-            <div className="flex justify-content-between align-items-start mb-4">
-                <div className="flex align-items-center gap-3">
-                    {article.article_image ? (
-                        <img
-                            src={article.article_image as string}
-                            alt={article.article_title}
-                            className="border-round"
-                            style={{ width: 64, height: 64, objectFit: 'cover' }}
-                        />
-                    ) : null}
-                    <h4 className="m-0">{article.article_title || '-'}</h4>
-                </div>
-                <Button label="Back" icon="pi pi-arrow-left" text onClick={() => router.push('/articles')} />
-            </div>
+            <Toolbar
+                start={
+                    <div className="flex align-items-center gap-3">
+                        {article.article_image ? (
+                            <img
+                                src={article.article_image as string}
+                                alt={article.article_title}
+                                className="border-round"
+                                style={{ width: 64, height: 64, objectFit: 'cover' }}
+                            />
+                        ) : null}
+                        <h4 className="m-0">{article.article_title || '-'}</h4>
+                    </div>
+                }
+                end={
+                    <Button label="Back" icon="pi pi-arrow-left" text onClick={() => router.push('/articles')} />
+                }
+                className="mb-4"
+            />
 
             <div className="flex flex-wrap gap-2 align-items-center mb-3">
                 <Tag value={status || 'DRAFT'} severity={severity} />
