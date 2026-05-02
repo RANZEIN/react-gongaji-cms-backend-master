@@ -13,7 +13,8 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Image } from 'primereact/image';
 
-import { deleteArticle, getArticleCategories, getArticles } from '@/features/articles/services/articleService';
+
+import { archiveArticle, getArticleCategories, getArticles, unarchiveArticle } from '@/features/articles/services/articleService';
 import type { Article, ArticleCategory } from '@/features/articles/types';
 
 export default function ArticlesPage() {
@@ -56,19 +57,37 @@ export default function ArticlesPage() {
 
     const onDelete = (articleUuid: string, articleSlug: string) => {
         confirmDialog({
-            message: 'Hapus artikel ini?',
+            message: 'Arsipkan artikel ini?',
             header: 'Konfirmasi',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
-                await deleteArticle(articleUuid, articleSlug);
+                await archiveArticle(articleUuid, articleSlug);
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Berhasil',
-                    detail: 'Artikel dihapus'
+                    detail: 'Artikel diarsipkan'
                 });
                 loadArticles();
             }
         });
+    };
+
+    const onUnarchive = async (articleUuid: string) => {
+        try {
+            await unarchiveArticle(articleUuid);
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Berhasil',
+                detail: 'Artikel dikembalikan'
+            });
+            loadArticles();
+        } catch (error: any) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Gagal',
+                detail: error?.message || 'Gagal mengembalikan artikel'
+            });
+        }
     };
 
     const statusBody = (row: Article) => {
@@ -78,34 +97,65 @@ export default function ArticlesPage() {
                 ? 'success'
                 : value === 'REVIEW'
                 ? 'warning'
+                : value === 'ARCHIVED'
+                ? 'danger'
                 : 'info';
 
         return <Tag value={value || 'DRAFT'} severity={severity} />;
     };
 
     const titleBody = (row: Article) => {
-        const imageSrc =
-            typeof row.article_image === 'string'
-                ? row.article_image
-                : '/no-image.png';
+    // Penanganan image source
+    const imageSrc =
+        typeof row.article_image === 'string' && row.article_image.trim() !== ''
+            ? row.article_image
+            : '/no-image.png';
 
-        return (
-            <div className="flex align-items-center gap-3">
+    return (
+        <div className="flex align-items-center gap-3 py-2">
+            {/* Bagian Gambar dengan Fitur Preview & Shadow */}
+            <div className="flex-shrink-0 shadow-2 border-round overflow-hidden" style={{ width: '60px', height: '60px' }}>
                 <Image
                     src={imageSrc}
                     alt={row.article_title}
-                    width="50"
-                    height="50"
-                    className="border-round"
+                    width="60"
+                    height="60"
+                    preview // Memungkinkan gambar diklik untuk diperbesar
+                    imageClassName="object-cover w-full h-full" // Menjaga rasio gambar tetap bagus
+                    className="block"
                 />
+            </div>
 
-                <div>
-                    <div className="font-semibold">{row.article_title || '-'}</div>
-                    <small className="text-500">/{row.article_slug || '-'}</small>
+            {/* Bagian Teks (Judul & Slug) */}
+            <div className="flex flex-column gap-1 overflow-hidden">
+                {/* Judul Artikel: Tebal, Hitam, dan titik-titik jika kepanjangan */}
+                <div
+                    className="font-bold text-900 text-base line-height-2 overflow-hidden text-overflow-ellipsis white-space-nowrap"
+                    style={{ maxWidth: '280px' }}
+                    title={row.article_title} // Munculkan teks asli saat kursor menempel
+                >
+                    {row.article_title || 'Untitled Article'}
+                </div>
+
+                {/* Slug Artikel: Dibuat seperti badge kecil agar lebih rapi */}
+                <div className="flex align-items-center gap-2">
+                    <span
+                        className="text-xs px-2 py-1 border-round-sm surface-200 text-600 font-medium tracking-tight"
+                        style={{ fontSize: '10px', textTransform: 'uppercase' }}
+                    >
+                        Slug
+                    </span>
+                    <small
+                        className="text-500 font-mono overflow-hidden text-overflow-ellipsis white-space-nowrap"
+                        style={{ maxWidth: '200px' }}
+                    >
+                        /{row.article_slug || '-'}
+                    </small>
                 </div>
             </div>
-        );
-    };
+        </div>
+    );
+};
 
     const viewsBody = (row: Article) => (
         <span>{Number(row.article_total_view || 0).toLocaleString('id-ID')}</span>
@@ -159,7 +209,7 @@ export default function ArticlesPage() {
             />
 
             <div className="grid mb-3">
-                <div className="col-12 md:col-4">
+                <div className="col-12 md:col-6">
                     <AutoComplete
                         value={keyword}
                         suggestions={keywordSuggestions}
@@ -178,7 +228,8 @@ export default function ArticlesPage() {
                             { label: 'All Status', value: '' },
                             { label: 'Draft', value: 'DRAFT' },
                             { label: 'Review', value: 'REVIEW' },
-                            { label: 'Published', value: 'PUBLISHED' }
+                            { label: 'Published', value: 'PUBLISHED' },
+                            { label: 'Archived', value: 'ARCHIVED' }
                         ]}
                         optionLabel="label"
                         optionValue="value"
@@ -199,7 +250,7 @@ export default function ArticlesPage() {
                     />
                 </div>
 
-                <div className="col-12 md:col-2 flex gap-2">
+                {/* <div className="col-12 md:col-2 flex gap-2">
                     <Button label="Apply" onClick={loadArticles} className="w-full" />
 
                     <Button
@@ -221,7 +272,7 @@ export default function ArticlesPage() {
                             }
                         }}
                     />
-                </div>
+                </div> */}
             </div>
 
             <DataTable
@@ -229,43 +280,80 @@ export default function ArticlesPage() {
                 loading={loading}
                 paginator
                 rows={10}
+                scrollable
+                scrollHeight="flex"
                 responsiveLayout="scroll"
                 emptyMessage="Belum ada artikel."
             >
-                {/* ❌ Column image dihapus */}
 
-                <Column header="Title" body={titleBody} />
-                <Column field="article_author" header="Author" />
-                <Column field="article_category" header="Category" />
-                <Column header="Status" body={statusBody} />
-                <Column header="Views" body={viewsBody} />
-                <Column header="Likes" body={likesBody} />
+            <Column header="Title" body={titleBody} style={{ minWidth: '250px' }} />
+            <Column field="article_author" header="Author" style={{ minWidth: '150px' }} />
+            <Column field="article_category" header="Category" style={{ minWidth: '150px' }} />
+            <Column header="Status" body={statusBody} style={{ minWidth: '120px' }} />
+            <Column header="Views" body={viewsBody} style={{ minWidth: '100px' }} />
+            <Column header="Likes" body={likesBody} style={{ minWidth: '100px' }} />
 
                 <Column
                     header="Actions"
-                    body={(row: Article) => (
-                        <div className="flex gap-2">
-                            <Button
-                                icon="pi pi-eye"
-                                text
-                                onClick={() => router.push(`/articles/article_view/${row.article_slug}`)}
-                            />
-                            <Button
-                                icon="pi pi-pencil"
-                                text
-                                onClick={() => router.push(`/articles/edit/${row.article_slug}`)}
-                            />
-                            <Button
-                                icon="pi pi-trash"
-                                text
-                                severity="danger"
-                                onClick={() =>
-                                    onDelete(row.article_uuid || '', row.article_slug || '')
-                                }
-                                disabled={!row.article_uuid && !row.article_slug}
-                            />
-                        </div>
-                    )}
+                    frozen
+                    alignFrozen="right"
+                    style={{ minWidth: '150px' }}
+                    body={(row: Article) => {
+                        const isArchived = (row.article_status || '').toUpperCase() === 'ARCHIVED';
+
+                        return (
+                            <div className="flex items-center justify-content-end gap-2">
+                                <Button
+                                    icon="pi pi-eye"
+                                    text
+                                    tooltip="View Detail"
+                                    onClick={() => router.push(`/articles/article_view/${row.article_slug}`)}
+                                />
+
+                                {isArchived ? (
+                                    <>
+                                        <Button
+                                            icon="pi pi-undo"
+                                            text
+                                            severity="success"
+                                            tooltip="Restore / Unarchive"
+                                            onClick={() => onUnarchive(row.article_uuid || '')}
+                                            disabled={!row.article_uuid}
+                                        />
+                                        <Button
+                                            icon="pi pi-trash"
+                                            text
+                                            severity="danger"
+                                            tooltip="Delete Permanently"
+                                            onClick={() => {
+                                                // Belum ada Delete API dari Kang Irsyad
+                                                onDelete(row.article_uuid || '', row.article_slug || '');
+                                            }}
+                                            disabled={!row.article_uuid}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Jika BELUM ARCHIVE: Tampilkan Edit & Tombol Archive (Tanpa Delete) */}
+                                        <Button
+                                            icon="pi pi-pencil"
+                                            text
+                                            tooltip="Edit Article"
+                                            onClick={() => router.push(`/articles/edit/${row.article_slug}`)}
+                                        />
+                                        <Button
+                                            icon="pi pi-inbox"
+                                            text
+                                            severity="warning"
+                                            tooltip="Archive"
+                                            onClick={() => onDelete(row.article_uuid || '', row.article_slug || '')}
+                                            disabled={!row.article_uuid}
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        );
+                    }}
                 />
             </DataTable>
         </div>

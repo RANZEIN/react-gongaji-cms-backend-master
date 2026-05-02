@@ -110,10 +110,10 @@ export default function StoreMerchantCategoriesPage() {
                     />
                 </div>
 
-                <div className="col-12 md:col-2 flex gap-2">
+                {/* <div className="col-12 md:col-2 flex gap-2">
                     <Button label="Apply" onClick={onApply} className="w-full" />
                     <Button icon="pi pi-refresh" outlined className="w-full" onClick={onReset} />
-                </div>
+                </div> */}
             </div>
 
             <DataTable

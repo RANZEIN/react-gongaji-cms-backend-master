@@ -361,7 +361,7 @@ export const updateArticle = async (articleUuid, payload) => {
   }
 };
 
-export const deleteArticle = async (articleUuid, articleSlug) => {
+export const archiveArticle = async (articleUuid, articleSlug) => {
   try {
     const response = await api.post(
       `${BASE_URL_ARTICLE}/v1/article/archived/${articleUuid}`,
@@ -387,6 +387,22 @@ export const deleteArticle = async (articleUuid, articleSlug) => {
         }
       }
     }
+    throw new Error(extractErrorMessage(error));
+  }
+};
+
+export const unarchiveArticle = async (articleUuid) => {
+  try {
+    const response = await api.post(
+      `${BASE_URL_ARTICLE}/v1/article/unarchived/${articleUuid}`,
+      new FormData(),
+      withVersion('V2')
+    );
+    if (!response.data?.status) {
+      throw new Error(response.data?.message || 'Gagal mengembalikan artikel');
+    }
+    return true;
+  } catch (error) {
     throw new Error(extractErrorMessage(error));
   }
 };
@@ -427,6 +443,11 @@ const syncArticleStatus = async (articleUuid, status) => {
   }
   if (normalized === 'REVIEW') {
     await postAction(`${BASE_URL_ARTICLE}/v1/article/review/${articleUuid}`);
+    return;
+  }
+  if (normalized === 'DRAFT') {
+    await postAction(`${BASE_URL_ARTICLE}/v1/article/draft/${articleUuid}`);
+    return;
   }
 };
 
