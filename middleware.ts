@@ -12,10 +12,10 @@ export function middleware(request: NextRequest) {
     }
 
     if (!token && !isAuthRoute) {
-        return NextResponse.redirect(new URL('/auth/login', request.url));
+        return NextResponse.redirect(new URL('/auth/signin', request.url));
     }
 
-    if (isAuthRoute && token && (pathname === '/auth/login' || pathname === '/auth/signup')) {
+    if (isAuthRoute && token && (pathname === '/auth/signin' || pathname === '/auth/signup')) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
