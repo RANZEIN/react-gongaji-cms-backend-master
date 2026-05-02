@@ -7,7 +7,7 @@ import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
 import { Message } from 'primereact/message';
 import Link from 'next/link';
-import { signup } from '@/services/authService';
+import { signup } from '@/features/auth/services/authService';
 
 const SignupPage = () => {
     const [fullname, setFullname] = useState('');
@@ -23,7 +23,7 @@ const SignupPage = () => {
             setLoading(true);
             setError('');
             await signup({ fullname, username, email, password });
-            router.push('/articles');
+            router.push('/');
         } catch (e) {
             setError('Signup gagal. Coba lagi.');
         } finally {
@@ -75,7 +75,7 @@ const SignupPage = () => {
                             )}
 
                             <div className="flex justify-content-end mb-5">
-                                <Link href="/auth/login" className="font-medium no-underline" style={{ color: 'var(--primary-color)' }}>
+                                <Link href="/auth/signin" className="font-medium no-underline" style={{ color: 'var(--primary-color)' }}>
                                     Sudah punya akun? Login
                                 </Link>
                             </div>
@@ -90,3 +90,4 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
+
