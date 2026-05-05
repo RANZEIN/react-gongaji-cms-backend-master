@@ -73,13 +73,18 @@ const AppMenu = () => {
                     label: 'Account',
                     icon: 'pi pi-fw pi-user',
                     items: [
+                        {
+                            label: 'Sign Up',
+                            icon: 'pi pi-fw pi-user-plus',
+                            to: '/auth/signout'
+                        },
                         // {
                         //     label: 'Login',
                         //     icon: 'pi pi-fw pi-sign-in',
                         //     to: ''
                         // },
                         {
-                            label: 'Logout',
+                            label: 'Sign Out',
                             icon: 'pi pi-fw pi-sign-out',
                             to: '/auth/signout'
                         },
