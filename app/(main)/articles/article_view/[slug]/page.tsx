@@ -1,4 +1,4 @@
 import ArticleViewDynamic from '../ArticleViewDynamic';
 
-export default ArticleViewDynamic ;
+export default ArticleViewDynamic;
 
