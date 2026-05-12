@@ -55,6 +55,10 @@ export default function StoreMerchantBannerDetails({
                             <div className="font-semibold">{banner.merchantb_title ?? '-'}</div>
                         </div>
                         <div>
+                            <div className="text-500 text-sm">Key</div>
+                            <div className="font-semibold">{banner.merchantb_key ?? '-'}</div>
+                        </div>
+                        <div>
                             <div className="text-500 text-sm">Brand</div>
                             <div className="font-semibold">{banner.merchantb_brand ?? '-'}</div>
                         </div>
