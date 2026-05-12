@@ -12,7 +12,7 @@ import { cleanHtmlForEditor } from '@/utils/htmlCleaner';
 import type { Article, ArticleCategory, ArticleTag } from '@/features/articles/types';
 
 type FormValues = Partial<Article>;
-type ArticleFormProps = {
+type CreateArticleFormProps = {
   value: FormValues;
   onChange: (key: keyof FormValues, value: string | string[] | File) => void;
   onSubmit: () => void;
@@ -27,7 +27,7 @@ type ArticleFormProps = {
 //   { label: 'Published', value: 'PUBLISHED' }
 // ];
 
-export default function ArticleForm({ value, onChange, onSubmit, loading, submitLabel }: ArticleFormProps) {
+export default function CreateArticleForm({ value, onChange, onSubmit, loading, submitLabel }: CreateArticleFormProps) {
   const selectedDate = useMemo(() => (value.article_date ? new Date(value.article_date) : undefined), [value.article_date]);
   const [categories, setCategories] = useState<ArticleCategory[]>([]);
   const [tags, setTags] = useState<ArticleTag[]>([]);
@@ -72,10 +72,10 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
             value={(value.article_author as string) ?? ''}
             onChange={(e) => onChange('article_author', e.target.value)}
             placeholder="Masukkan nama author"
-            />
+          />
         </div>
 
-        {/* <div className="field mb-4 col-12 md:col-6">
+        <div className="field mb-4 col-12 md:col-6">
           <label htmlFor="article_slug">Slug</label>
           <InputText
             id="article_slug"
@@ -84,11 +84,25 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
             placeholder="otomatis dari backend"
             disabled
           />
-        </div> */}
+        </div>
 
-        {/* Status field removed - article status will be managed by backend */}
+        <div className="field mb-4 col-12 md:col-6">
+          <label htmlFor="article_status">Status</label>
+          <Dropdown
+            id="article_status"
+            value={value.article_status ?? 'DRAFT'}
+            options={[
+              { label: 'Draft', value: 'DRAFT' },
+              { label: 'Review', value: 'REVIEW' },
+              { label: 'Published', value: 'PUBLISHED' }
+            ]}
+            optionLabel="label"
+            optionValue="value"
+            onChange={(e) => onChange('article_status', e.value)}
+          />
+        </div>
 
-        {/* <div className="field mb-4 col-12 md:col-6">
+        <div className="field mb-4 col-12 md:col-6">
           <label htmlFor="category_uuid">Category</label>
           <MultiSelect
             id="category_uuid"
@@ -114,8 +128,8 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
             display="chip"
             placeholder="Pilih tag"
           />
-        </div> */}
-{/*
+        </div>
+
         <div className="field mb-4 col-12 md:col-6">
           <label htmlFor="article_date">Publish Date</label>
           <Calendar
@@ -125,7 +139,7 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
             dateFormat="dd/mm/yy"
             onChange={(e) => onChange('article_date', e.value ? new Date(e.value as Date).toISOString() : '')}
           />
-        </div> */}
+        </div>
 
         <div className="field mb-4 col-12 md:col-6">
           <label htmlFor="article_source">Source</label>
@@ -147,37 +161,38 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
           />
         </div>
 
-         <div className="field mb-4 col-12">
-            <label htmlFor="article_image">Image <span className="text-red-500">*</span></label>
-            <input
-                id="article_image"
-                type="file"
-                accept="image/*"
-                className="p-inputtext p-component w-full"
-                onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onChange('article_image', file as any);
-                }}
+        <div className="field mb-4 col-12">
+          <label htmlFor="article_image">Image <span className="text-red-500">*</span></label>
+          <input
+            id="article_image"
+            type="file"
+            accept="image/*"
+            className="p-inputtext p-component w-full"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onChange('article_image', file as any);
+            }}
+          />
+          {value.article_image && typeof value.article_image === 'string' && (
+            <img
+              src={value.article_image}
+              alt="Preview"
+              className="mt-2 border-round"
+              style={{ maxHeight: '200px', objectFit: 'cover' }}
             />
-            {value.article_image && typeof value.article_image === 'string' && (
-                <img
-                src={value.article_image}
-                alt="Preview"
-                className="mt-2 border-round"
-                style={{ maxHeight: '200px', objectFit: 'cover' }}
-                />
-            )}
+          )}
         </div>
 
-        {/* <div className="field mb-4 col-12">
+        <div className="field mb-4 col-12">
           <label htmlFor="article_content">Summary</label>
           <InputTextarea
             id="article_content"
             rows={3}
             value={value.article_content ?? ''}
             onChange={(e) => onChange('article_content', e.target.value)}
+            placeholder="Enter summary..."
           />
-        </div> */}
+        </div>
 
         <div className="field mb-4 col-12">
           <label>Description (HTML) <span className="text-red-500">*</span></label>
@@ -188,7 +203,7 @@ export default function ArticleForm({ value, onChange, onSubmit, loading, submit
           />
         </div>
 
-      </div>
+        </div>
       <Button label={submitLabel} icon="pi pi-save" loading={loading} onClick={onSubmit} />
     </div>
   );
