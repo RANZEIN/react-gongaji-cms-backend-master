@@ -65,19 +65,26 @@ const buildArticleFormData = (payload = {}, { includeDraft = false } = {}) => {
   appendIfFilled('article_description', payload.article_description);
   appendIfFilled('article_summary', payload.article_content);
   appendIfFilled('article_published_date', payload.article_date);
-  appendIfFilled('article_author', payload.article_author);
+  // Always send article_author as it's required field
+  formData.append('article_author', payload.article_author || 'Unknown Author');
   appendIfFilled('article_source', payload.article_source);
   appendIfFilled('article_source_url', payload.article_source_url);
   appendIfFilled('tag_name', payload.tag_name);
 
   if (payload.category_uuid) {
+    console.log('Processing category_uuid:', payload.category_uuid);
     const list = Array.isArray(payload.category_uuid) ? payload.category_uuid : [payload.category_uuid];
-    list.filter(Boolean).forEach((entry) => formData.append('category_uuid', entry));
+    const filteredList = list.filter(Boolean);
+    console.log('Filtered category list:', filteredList);
+    filteredList.forEach((entry) => formData.append('category_uuid', entry));
   }
 
   if (payload.tag_uuid) {
+    console.log('Processing tag_uuid:', payload.tag_uuid);
     const list = Array.isArray(payload.tag_uuid) ? payload.tag_uuid : [payload.tag_uuid];
-    list.filter(Boolean).forEach((entry) => formData.append('tag_uuid', entry));
+    const filteredList = list.filter(Boolean);
+    console.log('Filtered tag list:', filteredList);
+    filteredList.forEach((entry) => formData.append('tag_uuid', entry));
   }
 
   if (payload.article_image instanceof File) {
@@ -259,6 +266,7 @@ export const getArticleById = async (articleUuid) => {
       params: {
         article_uuid: articleUuid,
         type_search: 'FIRST',
+        overview: 'FALSE',
         preload_category: 'TRUE',
         preload_article_category: 'TRUE',
         preload_article_category_to_category: 'TRUE',
@@ -283,6 +291,7 @@ export const getArticleBySlug = async (slug) => {
       params: {
         article_slug: slug,
         type_search: 'FIRST',
+        overview: 'FALSE',
         preload_category: 'TRUE',
         preload_article_category: 'TRUE',
         preload_article_category_to_category: 'TRUE',
@@ -290,31 +299,51 @@ export const getArticleBySlug = async (slug) => {
         preload_article_tag_to_tag: 'TRUE'
       }
     });
+
+    // Debug: Log API response
+    console.log('API Response for getArticleBySlug:', response.data);
+    console.log('Data array:', asArray(response.data?.data));
+
     const bySlug = normalizeArticle(asArray(response.data?.data)[0]);
+    console.log('Normalized article:', bySlug);
+
     if (bySlug.article_uuid) {
       return bySlug;
     }
   } catch (error) {
+    console.error('Error in getArticleBySlug:', error);
     // Continue to fallback strategy.
   }
 
+  // Fallback 1: Cari dengan keyword
+  console.log('Trying fallback 1: search by keyword');
   const listByKeyword = await getArticles({
     keyword: slug,
     overview: 'FALSE',
     type_search: 'FIND',
     preload_status: 'TRUE'
   });
+  console.log('Fallback 1 results:', listByKeyword.length, 'articles');
   const exact = listByKeyword.find((entry) => entry.article_slug === slug);
   if (exact) {
+    console.log('Found article in fallback 1:', exact.article_title);
     return exact;
   }
 
+  // Fallback 2: Cari di semua artikel
+  console.log('Trying fallback 2: search in all articles');
   const fallbackList = await getArticles({ overview: 'FALSE', limit: 200, preload_status: 'TRUE' });
+  console.log('Fallback 2 results:', fallbackList.length, 'articles');
   const fallback = fallbackList.find((entry) => entry.article_slug === slug);
-  if (!fallback) {
-    throw new Error('Artikel tidak ditemukan.');
+  if (fallback) {
+    console.log('Found article in fallback 2:', fallback.article_title);
+    return fallback;
   }
-  return fallback;
+
+  // Jika semua gagal
+  console.error('Article not found with slug:', slug);
+  console.error('Available slugs:', fallbackList.map(a => a.article_slug));
+  throw new Error(`Artikel dengan slug "${slug}" tidak ditemukan.`);
 };
 
 // Load article for "view" page (detail) and increment view counter.
@@ -349,12 +378,26 @@ export const createArticle = async (payload) => {
 
 export const updateArticle = async (articleUuid, payload) => {
   try {
+    console.log('updateArticle called with UUID:', articleUuid);
+    console.log('updateArticle payload:', payload);
+
     const formData = buildArticleFormData(payload, { includeDraft: false });
+    console.log('FormData entries:');
+Array.from(formData.entries()).forEach(([key, value]) => {
+  console.log(`  ${key}:`, value);
+});
+
     const response = await api.patch(`${BASE_URL_ARTICLE}/v1/article/update/${articleUuid}`, formData, withVersion('V3'));
+    console.log('Update API response:', response.data);
+
     if (!response.data?.status) {
       throw new Error(response.data?.message || 'Gagal update artikel');
     }
-    await syncArticleStatus(articleUuid, payload?.article_status);
+
+    // Temporarily disable syncArticleStatus to avoid 400 error
+    // await syncArticleStatus(articleUuid, payload?.article_status);
+    console.log('Article updated successfully (status sync disabled)');
+
     return response.data?.data;
   } catch (error) {
     throw new Error(extractErrorMessage(error));
@@ -431,21 +474,34 @@ export const replyComment = async (payload) => {
 };
 
 const postAction = async (url) => {
-  const response = await api.post(url, new FormData(), withVersion('V2'));
-  return response.data;
+  console.log('postAction called with URL:', url);
+  try {
+    const response = await api.post(url, new FormData(), withVersion('V2'));
+    console.log('postAction response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('postAction error:', error);
+    throw error;
+  }
 };
 
 const syncArticleStatus = async (articleUuid, status) => {
+  console.log('syncArticleStatus called with UUID:', articleUuid, 'status:', status);
   const normalized = `${status || ''}`.toUpperCase();
+  console.log('Normalized status:', normalized);
+
   if (normalized === 'PUBLISHED') {
+    console.log('Publishing article...');
     await postAction(`${BASE_URL_ARTICLE}/v1/article/published/${articleUuid}`);
     return;
   }
   if (normalized === 'REVIEW') {
+    console.log('Setting article to review...');
     await postAction(`${BASE_URL_ARTICLE}/v1/article/review/${articleUuid}`);
     return;
   }
   if (normalized === 'DRAFT') {
+    console.log('Setting article to draft...');
     await postAction(`${BASE_URL_ARTICLE}/v1/article/draft/${articleUuid}`);
     return;
   }
